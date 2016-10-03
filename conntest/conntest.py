@@ -4,6 +4,7 @@
 
 from __future__ import print_function
 from __future__ import unicode_literals
+from opsview import Opsview
 from rdpy.protocol.rdp import rdp
 from rdpy.protocol.rfb import rfb
 from twisted.internet import reactor
@@ -178,7 +179,7 @@ def rdp_connection(hostname, username, password, domain=None, port=3389,
 def vcenter_connection(hostname, username, password, domain=None, port=443,
                        verify=True):
     try:
-        user = username if not domain else '{}@{}'.format(username, domain)
+        user = '{}@{}'.format(username, domain) if domain else username
         shortmomi.connect(hostname, user, password, verify=verify)
         return True
     except shortmomi.ConnectionError:
@@ -187,6 +188,21 @@ def vcenter_connection(hostname, username, password, domain=None, port=443,
                 username, password, hostname
             )
         )
+    return False
+
+
+def opsview_connection(hostname, username, password, port=443, verify=True):
+    try:
+        ops = Opsview(
+            hostname,
+            username=username,
+            password=password,
+            verify_ssl=verify
+        )
+        ops.user_info()
+        return True
+    except AssertionError:
+        pass
     return False
 
 
@@ -291,12 +307,34 @@ def parse_args():
         required=False
     )
     vcenter_subparser.add_argument(
+        '-k', '--skip-cert-verification',
+    )
+    vcenter_subparser.add_argument(
         '-P', '--port',
         type=int,
         default=443,
         required=False
     )
-    vcenter_subparser.add_argument('HOSTNAME')
+    opsview_subparser = protocol_subparsers.add_parser(
+        'opsview',
+        help='Opsview connection'
+    )
+    opsview_subparser.add_argument(
+        '-k', '--skip-cert-verification',
+    )
+    opsview_subparser.add_argument(
+        '-u', '--username',
+    )
+    opsview_subparser.add_argument(
+        '-p', '--password'
+    )
+    opsview_subparser.add_argument(
+        '-P', '--port',
+        type=int,
+        default=443,
+        required=False
+    )
+    opsview_subparser.add_argument('HOSTNAME')
     return parser.parse_args()
 
 
@@ -332,8 +370,19 @@ def main():
             domain=args.domain,
             username=args.username,
             password=args.password,
-            port=args.port
+            port=args.port,
+            verify=not args.skip_ssl_verification
         )
+    elif args.protocol == 'opsview':
+        result = opsview_connection(
+            hostname=args.HOSTNAME,
+            domain=args.domain,
+            username=args.username,
+            password=args.password,
+            port=args.port,
+            verify=not args.skip_ssl_verification
+        )
+
     if result:
         print('Connection succeesfully established!')
     else:
