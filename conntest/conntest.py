@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class MyVNCFactory(rfb.ClientFactory):
-    def __init__(self, password, timeout=10):
+    def __init__(self, password=None, timeout=10):
         self._password = password
         self._timeout = timeout
         self._success = False
@@ -156,7 +156,7 @@ def ssh_connection(hostname, username, password, port=22, timeout=10):
     return False
 
 
-def vnc_connection(hostname, password, port=5900, timeout=10):
+def vnc_connection(hostname, password=None, port=5900, timeout=10):
     r = reactor.connectTCP(hostname, port, MyVNCFactory(password, timeout))
     if not reactor.running:
         reactor.run()
@@ -256,7 +256,8 @@ def parse_args():
         help='VNC connection'
     )
     vnc_subparser.add_argument(
-        '-p', '--password'
+        '-p', '--password',
+        required=False
     )
     vnc_subparser.add_argument(
         '-P', '--port',

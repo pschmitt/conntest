@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='conntest',
-    version='1.0',
+    version='1.1',
     license='GPL3',
     description='Try to connect to a host via SSH/RDP/VNC/VMware vCenter auth etc',
     long_description=open('README.rst').read(),
