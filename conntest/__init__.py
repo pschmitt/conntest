@@ -1,1 +1,1 @@
-from conntest import *
+from .conntest import *
