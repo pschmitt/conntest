@@ -11,6 +11,9 @@ import shortmomi
 import sys
 
 
+LOGGER = logging.getLogger(__name__)
+
+
 def ssh_connection(hostname, username, password, port=22, timeout=10):
     try:
         ssh = paramiko.SSHClient()
@@ -24,10 +27,10 @@ def ssh_connection(hostname, username, password, port=22, timeout=10):
             port=port,
             timeout=timeout,
         )
-        logger.info("SSH {}@{}: Login succeeded".format(username, hostname))
+        LOGGER.info("SSH {}@{}: Login succeeded".format(username, hostname))
         return True
     except:
-        logger.error(
+        LOGGER.error(
             "SSH {}@{}: Login failed! Password: {}".format(
                 username, hostname, password
             )
@@ -43,7 +46,7 @@ def vcenter_connection(
         shortmomi.connect(hostname, user, password, verify=verify)
         return True
     except shortmomi.ConnectionError:
-        logger.error(
+        LOGGER.error(
             "Could not login using {}:{} on the vCenter at {}".format(
                 username, password, hostname
             )
