@@ -26,5 +26,5 @@ service-identity==18.1.0
 shortmomi==1.7.0
 six==1.13.0
 twisted==20.3.0
-urllib3==1.25.7
+urllib3==1.25.8
 zope.interface==4.7.1
